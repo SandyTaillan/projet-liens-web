@@ -59,17 +59,52 @@ def trouvdosdefault():
             dosdefault = os.path.abspath(dossier) + "/places.sqlite"
             shutil.copy(dosdefault, chcopybdd)
 
-def remplirbdd():
+
+def recupbdd():
     """J'ai besoin de récupérer les données de la BDD de firefox. Seulement les données qui m'intéressent."""
 
-    #coonection à la base de données de firefox
-    print(dosdefault)
-    # connection = sqlite3.connect("/home/sandy/Bureau/places.sqlite")
-    # cursor = connection.cursor()
-    # #récupération de l'url de mes liens
-    # cursor.execute('SELECT url FROM moz_places')
-    # for record in cursor:
-    #     print(record)
+    #déclaration des variables
+    global ffdonn1
+    global ffdonn2
+
+    # connection à la copie de la  base de données firefox
+    connection = sqlite3.connect(chcopybdd)
+    cursor = connection.cursor()
+
+    # récupération de l'id et de mes titres de liens
+    cursor.execute("""SELECT  moz_places.url,moz_places.description, moz_bookmarks.title, moz_origins.prefix,
+     moz_origins.host FROM moz_bookmarks, moz_origins  JOIN moz_places ON moz_places.id = moz_bookmarks.fk 
+     AND moz_places.origin_id = moz_origins.id""")
+    # cursor.execute('SELECT fk, title FROM moz_bookmarks')
+    ffdonn1 = cursor.fetchall()
+    print(ffdonn1)
+
+    connection.close()
+
+def assimbddff():
+    """Traitement des données de la BDD de firefox en vue de l'intégrer dans ma propre BDD."""
+
+    ffdonn = {}
+    list(ffdonn1)
+    list(ffdonn2)
+
+    ffdonn1.remove("None")
+    print(ddfonn1)
+    # for i in range(len(ffdonn1)):
+    #     if None in ffdonn1[i]:
+    #         ffdonn.pop[i]
+    # print(ffdonn)
+
+    #         ffdonn1.pop(i)
+    # print(ffdonn1)
+
+
+
+
+
+
+
+
 
 
 
@@ -135,10 +170,14 @@ def veriflien():
 #     for record in cursor:
 #         print(record)
 
-
+# vérifier si ma base de données existe si ce n'est pas le cas, elle est créée
 if not os.path.isfile(chembd):
     creabd()
+# Trouver le dossier contenant la base de données de Firefox (son nom varie)
 trouvdosdefault()
-remplirbdd()
+# récupérer les données de la BDD de Firefoc pour remplir ma propre BDD
+recupbdd()
+#assimbddff()
+
 # veriflien()
 # ecriturefichdata()
