@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-#todo : récupérer les données que je veux de la base de données Firefox vers des listes ou dictionnaires
-#todo : Entrer les valeurs dans la nouvelle base de données.
-#todo : faire les tests de validité des liens.
-#todo : faire une table pour les liens non valides pour permettre de les retester selon le message d'erreur.
-#todo : Pour les liens non valides : les retester à intervalle régulier
-#todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
-
+# todo : récupérer les données que je veux de la base de données Firefox vers des listes ou dictionnaires
+# todo : Entrer les valeurs dans la nouvelle base de données.
+# todo : faire les tests de validité des liens.
+# todo : faire une table pour les liens non valides pour permettre de les retester selon le message d'erreur.
+# todo : Pour les liens non valides : les retester à intervalle régulier
+# todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
 
 
 import os
@@ -19,21 +18,23 @@ import requests
 
 # chemin du dossier en cours
 chbase = os.path.dirname(__file__)
-# chemin relatif de mon fichier à traiter
-chemfichier = "/bookmarks.html"
-chemfichierbis = "mesdata.html"
-# le chemin complet
-chemin = chbase + "/" + chemfichier
-cheminbis = chbase + "/" + chemfichierbis
-chembd = 'data/bd-liens.sqlite'
-chemDBff = '/home/sandy/.mozilla/firefox'
+# chemin de la nouvelle copie de la BDD de Firefox
 chcopybdd = os.path.dirname(__file__) + "/places.sqlite"
+# Chemin de ma propre base de données.
+chembd = 'data/bd-liens.sqlite'
+
+# chemin relatif de mon fichier à traiter
+# chemfichier = "/bookmarks.html"
+# chemfichierbis = "mesdata.html"
+# le chemin complet
+# chemin = chbase + "/" + chemfichier
+# cheminbis = chbase + "/" + chemfichierbis
+
+
 data = []
 mesliens = {}
 liensverif = {}
 lienserreur = {}
-
-
 
 
 def creabd():
@@ -49,11 +50,13 @@ def creabd():
 
 def trouvdosdefault():
     """La base de données de Firefox se trouve dans un dossier qui peut changer de nom.
-    Il me faut donc chercher un dossier contenant le mot default qui lui ne change pas."""
+    Il me faut donc chercher un dossier contenant le mot 'default' qui lui ne change pas."""
 
-    global dosdefault
+    # Déclaration de mes variables
+    chemdbff = '/home/sandy/.mozilla/firefox'
 
-    fich = glob(chemDBff + "/*")
+    # copie de la BDD de firefox
+    fich = glob(chemdbff + "/*")
     for dossier in fich:
         if "default" in dossier:
             dosdefault = os.path.abspath(dossier) + "/places.sqlite"
@@ -63,9 +66,8 @@ def trouvdosdefault():
 def recupbdd():
     """J'ai besoin de récupérer les données de la BDD de firefox. Seulement les données qui m'intéressent."""
 
-    #déclaration des variables
+    # déclaration des variables
     global ffdonn1
-    global ffdonn2
 
     # connection à la copie de la  base de données firefox
     connection = sqlite3.connect(chcopybdd)
@@ -80,30 +82,6 @@ def recupbdd():
     print(ffdonn1)
 
     connection.close()
-
-def assimbddff():
-    """Traitement des données de la BDD de firefox en vue de l'intégrer dans ma propre BDD."""
-
-    ffdonn = {}
-    list(ffdonn1)
-    list(ffdonn2)
-
-    ffdonn1.remove("None")
-    print(ddfonn1)
-    # for i in range(len(ffdonn1)):
-    #     if None in ffdonn1[i]:
-    #         ffdonn.pop[i]
-    # print(ffdonn)
-
-    #         ffdonn1.pop(i)
-    # print(ffdonn1)
-
-
-
-
-
-
-
 
 
 
@@ -161,23 +139,14 @@ def veriflien():
     print("c'est fini")
 
 
-# def connectbasdonnees():
-#     """Fonction permettant de se connecter à la base de données et de récupérer les éléments utiles pour la suite."""
-#
-#     connect = sqlite3.connect('places.sqlite')
-#     cursor = connect.cursor()
-#     cursor.execute('SELECT * FROM moz_bookmarks')
-#     for record in cursor:
-#         print(record)
-
-# vérifier si ma base de données existe si ce n'est pas le cas, elle est créée
+# vérifier si ma base de données existe si ce n'est pas le cas, elle est créée.
 if not os.path.isfile(chembd):
     creabd()
 # Trouver le dossier contenant la base de données de Firefox (son nom varie)
 trouvdosdefault()
 # récupérer les données de la BDD de Firefoc pour remplir ma propre BDD
 recupbdd()
-#assimbddff()
+
 
 # veriflien()
 # ecriturefichdata()
