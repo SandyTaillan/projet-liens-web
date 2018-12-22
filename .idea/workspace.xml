@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c604858f-eafd-4d09-ade1-9fc5b19cb780" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/places.sqlite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gestion-liens-web.py" beforeDir="false" afterPath="$PROJECT_DIR$/gestion-liens-web.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/places.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/places.sqlite" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,10 +18,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gestion-liens-web.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1431">
-              <caret line="148" lean-forward="true" selection-start-line="148" selection-end-line="148" />
+            <state relative-caret-position="569">
+              <caret line="201" lean-forward="true" selection-start-line="201" selection-end-line="201" />
               <folding>
-                <element signature="e#515#524#0" expanded="true" />
+                <element signature="e#1030#1849#0" />
+                <element signature="e#1879#2426#0" />
+                <element signature="e#2449#3599#0" />
+                <element signature="e#3632#4287#0" />
+                <element signature="e#4311#6845#0" />
               </folding>
             </state>
           </provider>
@@ -56,11 +61,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2896" />
-    <option name="y" value="21" />
-    <option name="width" value="944" />
-    <option name="height" value="1059" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1957" />
+    <option name="y" value="29" />
+    <option name="width" value="1626" />
+    <option name="height" value="1046" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -197,11 +202,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1952" y="-4" width="1888" height="1084" extended-state="6" />
+    <frame x="1957" y="29" width="1626" height="1046" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49511856" visible="true" weight="0.15709643" />
-      <window_info id="Structure" order="1" sideWeight="0.50488144" side_tool="true" visible="true" weight="0.15709643" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49154747" visible="true" weight="0.1395202" />
+      <window_info id="Structure" order="1" sideWeight="0.50845253" side_tool="true" visible="true" weight="0.1395202" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="0" weight="0.32979852" />
       <window_info anchor="bottom" id="Python Console" order="1" weight="0.32954547" />
@@ -209,10 +214,10 @@
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" />
       <window_info anchor="bottom" id="Terminal" order="5" weight="0.32873806" />
-      <window_info active="true" anchor="bottom" id="Run" order="6" visible="true" weight="0.25929752" />
-      <window_info anchor="bottom" id="Debug" order="7" sideWeight="0.49961627" weight="0.39872748" />
-      <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="6" sideWeight="0.49961627" weight="0.39872748" />
+      <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Run" order="9" visible="true" weight="0.17311828" />
       <window_info anchor="bottom" id="TODO" order="10" weight="0.32979852" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -277,20 +282,24 @@
     <entry file="file://$USER_HOME$/Bureau/test-mielpops/test.sh">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/gestion-liens-web.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1431">
-          <caret line="148" lean-forward="true" selection-start-line="148" selection-end-line="148" />
-          <folding>
-            <element signature="e#515#524#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Bureau/peak.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="7" column="12" selection-start-line="7" selection-start-column="12" selection-end-line="7" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gestion-liens-web.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="201" lean-forward="true" selection-start-line="201" selection-end-line="201" />
+          <folding>
+            <element signature="e#1030#1849#0" />
+            <element signature="e#1879#2426#0" />
+            <element signature="e#2449#3599#0" />
+            <element signature="e#3632#4287#0" />
+            <element signature="e#4311#6845#0" />
+          </folding>
         </state>
       </provider>
     </entry>
