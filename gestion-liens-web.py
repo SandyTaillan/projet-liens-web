@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# todo : faire les tests de validité des liens.
-# todo : faire une table pour les liens non valides pour permettre de les retester selon le message d'erreur.
 # todo : Pour les liens non valides : les retester à intervalle régulier
 # todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
 # todo : Faire une fonction update pour récupérer les mises à jours de la DBB de Firefox
 # todo : Gérer les exceptions sur la BDD
 # todo : ne vérifier que 100 lignes de liens à la fois ou tout vérifier d'un coup -> demande dans interface graphique
-
+# todo : gérer les url doublons
 
 import os
 from glob import glob
@@ -122,9 +120,8 @@ def veriflien():
     print("lancement fonction veriflien")
     # Déclaration des variables de la fonction
     global nouvbdgesterr
-    nouvbdgesterr = []
+    nouvbdgesterr = {}
     situation = ""
-    ajout_depre = 0
     suppression = 0
 
     connection = sqlite3.connect(chembd)
@@ -135,6 +132,7 @@ def veriflien():
     bdgesterr = cursor.fetchall()
 
     for donn in bdgesterr:
+        ajout_depre = 0
         try:
             r = requests.get(donn[1], timeout=7)
             if r.status_code == requests.codes.ok:
@@ -170,11 +168,13 @@ def veriflien():
             ajout_depre = 10
 
         depreciation = donn[3] + ajout_depre
-        nouvbdgesterr.append((donn[0], situation, depreciation, suppression))
+
+        nouvbdgesterr[donn[0]] = [situation, depreciation, suppression]
         # Si la depreciation arrive à 100, alors j'envisage la suppression du lien.
         for donn1 in nouvbdgesterr:
-            if donn1[2] == 100:
-                donn1[3] = 1
+            print(donn1)
+            if nouvbdgesterr[donn1][1] == 100:
+                nouvbdgesterr[donn1][2] = 1
 
     cursor.close()
     connection.close()
@@ -189,12 +189,18 @@ def updatabgeserr():
     # connection à la bdd interne
     connection = sqlite3.connect(chembd)
     cursor = connection.cursor()
+    for donn in nouvbdgesterr.items():
+        cursor.execute("""UPDATE gestion_erreur SET situation = ? WHERE ID = ?""", (donn[1][0], donn[0]))
+        cursor.execute("""UPDATE gestion_erreur SET depreciation = ? WHERE ID = ?""", (donn[1][1], donn[0]))
+        cursor.execute("""UPDATE gestion_erreur SET attente_suppression = ? WHERE ID = ?""", (donn[1][2], donn[0]))
 
-    for donn in nouvbdgesterr:
-        cursor.execute("""UPDATE gestion_erreur(id, situation, depreciation, attente_suppression)
-                        VALUES(?,?,?,?)""", donn)
     connection.commit()
     connection.close()
+
+
+
+
+
 
 # vérifier si ma base de données existe si ce n'est pas le cas, elle est créée.
 if not os.path.isfile(chembd):
@@ -202,3 +208,4 @@ if not os.path.isfile(chembd):
 
 
 veriflien()
+
