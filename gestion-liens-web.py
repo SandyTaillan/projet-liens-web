@@ -11,7 +11,6 @@ import os
 from glob import glob
 import sqlite3
 import shutil
-from bs4 import BeautifulSoup
 import requests
 
 
@@ -38,6 +37,8 @@ def creabd():
                     Prefixe TEXT, host TEXT)""")
     cursor.execute("""CREATE TABLE gestion_erreur(id INTEGER PRIMARY KEY, situation TEXT,depreciation INTEGER,
                     attente_suppression INTEGER)""")
+    cursor.execute("""CREATE TABLE scrapping(id INTEGER PRIMARY KEY, titre_scrap TEXT, description_scrap TEXT,
+                    h1 TEXT, h2 TEXT, h3 TEXT, categories TEXT, mots_clefs TEXT mes_mots_clefs TEXT)""")
 
     connection.close()
 
@@ -198,14 +199,9 @@ def updatabgeserr():
     connection.close()
 
 
-
-
-
-
 # vérifier si ma base de données existe si ce n'est pas le cas, elle est créée.
 if not os.path.isfile(chembd):
     creabd()
 
 
 veriflien()
-
