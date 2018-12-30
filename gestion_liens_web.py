@@ -199,9 +199,7 @@ def updatabgeserr():
     connection.close()
 
 
-# vérifier si ma base de données existe si ce n'est pas le cas, elle est créée.
-if not os.path.isfile(chembd):
-    creabd()
+
 
 
 veriflien()

@@ -7,7 +7,6 @@ import re
 
 url = "http://www.audio-maniac.com/?page_id=827"
 
-
 lienh2 = []
 lienh3 = []
 lienh4 = []
@@ -15,7 +14,6 @@ lienstrong = []
 lienaside = []
 lientag = []
 reponse = requests.get(url)
-
 soup = BeautifulSoup(reponse.text, "html5lib")
 
 # Recherche de titres dans le partie section - content
@@ -49,3 +47,5 @@ print(f"h4: {lienh4}")
 print(f"strong: {lienstrong}")
 print(f"Les catégories : {lienaside}")
 print(f"Les tags : {lientag}")
+
+
