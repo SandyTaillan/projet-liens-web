@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# todo : Pour les liens non valides : les retester à intervalle régulier
-# todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
-# todo : Faire une fonction update pour récupérer les mises à jours de la DBB de Firefox
-# todo : Gérer les exceptions sur la BDD
-# todo : ne vérifier que 100 lignes de liens à la fois ou tout vérifier d'un coup -> demande dans interface graphique
-# todo : gérer les url doublons
-
 import os
 from glob import glob
 import sqlite3
@@ -37,8 +30,9 @@ def creabd():
                     Prefixe TEXT, host TEXT)""")
     cursor.execute("""CREATE TABLE gestion_erreur(id INTEGER PRIMARY KEY, situation TEXT,depreciation INTEGER,
                     attente_suppression INTEGER)""")
-    cursor.execute("""CREATE TABLE scrapping(id INTEGER PRIMARY KEY, titre_scrap TEXT, description_scrap TEXT,
-                    h1 TEXT, h2 TEXT, h3 TEXT, categories TEXT, mots_clefs TEXT mes_mots_clefs TEXT)""")
+    cursor.execute("""CREATE TABLE scraping(id INTEGER PRIMARY KEY, titre_scrap TEXT, description_scrap TEXT,
+                    h1 TEXT, h2 TEXT, h3 TEXT, h4 TEXT, strong TEXT, categories TEXT, mots_clefs TEXT,
+                     mes_mots_clefs TEXT)""")
 
     connection.close()
 
@@ -73,8 +67,9 @@ def recupbdd():
     # déclaration des variables
     global ffdonn1
     global ffdonn2
+    global ffdonn3
     ffdonn2 = []
-
+    ffdonn3 = []
     # connection à la copie de la  base de données firefox
     connection = sqlite3.connect(chcopybdd)
     cursor = connection.cursor()
@@ -90,8 +85,20 @@ def recupbdd():
     situation = "pas vérifié"
     depreciation = 0
     suppression = 0
+    # Préparation du contenu de la table "scraping"
+    titre_scrap = "-"
+    description_scrap = "-"
+    h1 = ""
+    h2 = ""
+    h3 = ""
+    h4 = ""
+    strong = ""
+    categories = ""
+    mots_clefs = ""
+
     for i in range(1, len(ffdonn1)):
         ffdonn2.append([i, situation, depreciation, suppression])
+        ffdonn3.append([i, titre_scrap, description_scrap, h1, h2, h3, h4, strong, categories, mots_clefs])
 
     cursor.close()
     connection.close()
@@ -110,6 +117,9 @@ def envoidonneefirefox():
     for donnees2 in ffdonn2:
         cursor.execute("""INSERT INTO gestion_erreur(id, situation, depreciation, attente_suppression)
                         VALUES(?,?,?,?)""", donnees2)
+    for donnees3 in ffdonn3:
+        cursor.execute("""INSERT INTO scraping(id, titre_scrap, description_scrap, h1, h2, h3, h4, strong, categories,
+         mots_clefs) VALUES(?,?,?,?,?,?,?,?,?,?)""", donnees3)
     connection.commit()
     connection.close()
 
@@ -129,7 +139,7 @@ def veriflien():
     cursor = connection.cursor()
     cursor.execute("""SELECT liens_meta.id, liens_meta.url, gestion_erreur.situation, gestion_erreur.depreciation, 
                     gestion_erreur.attente_suppression FROM gestion_erreur JOIN liens_meta 
-                    ON gestion_erreur.id = liens_meta.id""")
+                    ON gestion_erreur.id = liens_meta.id where gestion_erreur.situation != "tout va bien" """)
     bdgesterr = cursor.fetchall()
 
     for donn in bdgesterr:
@@ -164,6 +174,7 @@ def veriflien():
             ajout_depre = 50
         except requests.exceptions.ConnectionError:
             situation = "erreur: connection"
+            ajout_depre = 10
         except:
             situation = "erreur: inconnue"
             ajout_depre = 10
@@ -173,7 +184,6 @@ def veriflien():
         nouvbdgesterr[donn[0]] = [situation, depreciation, suppression]
         # Si la depreciation arrive à 100, alors j'envisage la suppression du lien.
         for donn1 in nouvbdgesterr:
-            print(donn1)
             if nouvbdgesterr[donn1][1] == 100:
                 nouvbdgesterr[donn1][2] = 1
 
@@ -199,7 +209,29 @@ def updatabgeserr():
     connection.close()
 
 
+def recupbddscraping():
+
+    print("lancement fonction pour aller chercher donnée dans bdd : recupbddscraping")
+    connection = sqlite3.connect(chembd)
+    cursor = connection.cursor()
+    cursor.execute("""SELECT liens_meta.id, liens_meta.url, scraping.titre_scrap FROM scraping 
+                    JOIN liens_meta ON scraping.id = liens_meta.id""")
+    bdgesscrap = cursor.fetchone()
+    print(f"bdgesscrap: {bdgesscrap}")
+    connection.close()
+    return bdgesscrap
 
 
+def envoiedonnscraping(donnscrap):
+    print("Lancement fonction envoie à la table scraping")
 
-veriflien()
+    connection = sqlite3.connect(chembd)
+    cursor = connection.cursor()
+    print(f"Voici donnscrap dans la mise à jour de la table : {donnscrap}")
+    cursor.execute("""UPDATE scraping SET titre_scrap = ?, description_scrap = ?, h1 = ?, h2 = ?,h3 = ?, h4 = ?,
+                    strong = ?, categories = ?, mots_clefs = ?
+                     WHERE ID = ?""", (donnscrap[1], donnscrap[2], donnscrap[3], donnscrap[4],donnscrap[5],
+                                       donnscrap[6], donnscrap[7], donnscrap[8], donnscrap[9], donnscrap[0]))
+
+    connection.commit()
+    connection.close()
