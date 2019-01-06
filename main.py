@@ -1,84 +1,85 @@
 # -*- coding: utf-8 -*-
-
-# todo : Pour les liens non valides : les retester à intervalle régulier
-# todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
-# todo : Faire une fonction update pour récupérer les mises à jours de la DBB de Firefox
-# todo : Gérer les exceptions sur la BDD -> que se passe-t-il si je ne trouve pas le chemin bdd de Firefox par exemple
-# todo : ne vérifier que 100 lignes de liens à la fois ou tout vérifier d'un coup -> demande dans interface graphique
-# todo : gérer les url doublons
-
-# En python 3.7
-
-"""Le but de ce script est gérer mes marques-pages Firefox.
-    La gestion de ces marques-pages va se faire en plusieurs temps :
-    - création d'une base de données ;
-    - gestion des liens à problèmes : inexistant, erreur d'http, etc... ;
-    - gestion des mots-clefs pour le tri à la demande.
-"""
+#
 
 # importation des modules
+# English : import of modules
 import os
 # importation des autres fichiers de ce programme
-import gestion_liens_web as glw
-from liens_scraping import Scrap as lscr
+# importation of others files of this programme
+import utils as utl
+from gestbdd import Gestionbdd as Gbdd
+from gestlien import Gestionlienweb as Glw
+from gestscrap import Gestionlienscrap as Glsc
 
 
-class Main(lscr):
-    """Cette classe est la jonction entre tous les autres fichiers de ce programme.
-    Il va permettre de lier les scripts de l'interface graphique avec ceux destinés aux calculs."""
-
+class Main(Gbdd):
     def __init__(self):
         super(Main, self).__init__()
-
+        
         self.lientitre = ""
-        self.liendescr = []
+        self.liendescr = ""
         self.lienh1 = ""
-        self.lienh2 = []
-        self.lienh3 = []
-        self.lienh4 = []
-        self.lienstrong = []
-        self.lienaside = []
-        self.lientag = []
-
-        self.url = ""
-        self.bdgesscrap = []
-        # Chemin de ma propre base de données.
-        chembd = 'data/bd-liens.sqlite'
+        self.h2 = []
+        self.lienh2 = ""
+        self.h3 = []
+        self.lienh3 = ""
+        self.h4 = []
+        self.lienh4 = ""
+        self.strong = []
+        self.lienstrong = ""
+        self.aside = []
+        self.lienaside = ""
+        self.tag = []
+        self.lientag = ""
 
         # vérifier si ma base de données existe si ce n'est pas le cas, elle est créée.
-        if not os.path.isfile(chembd):
-            print("Dans le main :\nLa base de données va être créée")
-            glw.creabd()
+        # English : check if my database exists if it doesn't, it is created.
+
+        print(f"voici le chemin utl.CHEMBD : {utl.CHEMBD}")
+        if not os.path.isfile(utl.CHEMBD):
+            print("Dans le main :\ndemande de création de la bdd")
+            Gbdd.creabd(self)
+            # Trouver le dossier contenant la base de données de Firefox (son nom varie)
+            # English : Find the folder containing the Firefox database (its name varies)
+            Gbdd.trouvdosdefault(self)
+            # récupérer les données de la BDD de Firefox pour remplir ma propre BDD
+            # English : retrieve the data from the Firefox database to fill in my own database
+            Gbdd.recupbddff(self)
+            # Remplir ma BDD avec les données de Firefox
+            # English : Fill my database with Firefox data
+            Gbdd.envoidonneefirefox(self)
+            # Vérification de la validité des liens et su scraping
+            self.majbdd()
         else:
             print("Dans le main : \nla base de données existe bien")
 
-        # Vérification de la validité des liens
-            #glw.veriflien()
+    def majbdd(self):
+        """Fonction pour vérifier les liens et faire le scraping à la création de la BDD"""
+        
+        # récupérer le nombre d'enregistrement total de ma table liens_meta pour faire une boucle
+        bdgesterr = Gbdd.recupbdd(self)
+        for idbdd in bdgesterr:
+            # pour chaque enregistrement de ma BDD, je vais vérifier si le lien est valide
+            print(f"données de la BDD sur la gestion des erreurs de liens : {idbdd}")
+            monurl = idbdd[1]
+            mondepre = idbdd[3]
+            situation, depreciation = Glw.veriflien(self, monurl, mondepre)
+            listgesterr = [idbdd[0], situation, depreciation, idbdd[4]]
+            print(f"le nouvel enregistrement, pour la gestion des liens est : {listgesterr}")
+            # envoie de listgesterr dans la bdd
+            Gbdd.envoigesterreur(self, listgesterr)
 
-        self.scraping()
+            # Maintenant que les liens sont vérifiés, je peux maintenant m'occuper de 'scraper' les liens
+            # si la situation du lien est correxte, alors on peut scraper, sinon, on passe son chemin
+            if listgesterr[1] == "tout va bien":
+                self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3, self.lienh4, self.lienstrong, \
+                self.lienaside, self.lientag = Glsc.scraping(self, monurl)
 
-
-    def scraping(self):
-        """Gestion du scraping des sites internet."""
-        print("on entre dans la fonction de scraping du main")
-        # Déclaration des variables
-        self.donnscrap = []
-        # lancement de la fonction pour récupérer les liens à traiter de la BDD
-        self.bdgesscrap = glw.recupbddscraping()
-        print("Dans le main, fonction scraping :\nRécupération de self.bdgesscrap")
-        print(self.bdgesscrap)
-        print(type(self.bdgesscrap))
-        if self.bdgesscrap[2] == '-':
-            url = self.bdgesscrap[1]
-            print(f"url dans scraping : {url}")
-            self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3, self.lienh4, self.lienstrong,\
-            self.lienaside, self.lientag = lscr.scrapingurl(self, url)
-        print("J'en suis là !! -------------------------")
-
-        self.donnscrap = [self.bdgesscrap[0], self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3,
-                          self.lienh4, self.lienstrong, self.lienaside, self.lientag]
-        print(f"donnscrap : {self.donnscrap}")
-        glw.envoiedonnscraping(self.donnscrap)
+                listgestscrap = [idbdd[0], self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3,
+                                 self.lienh4, self.lienstrong, self.lienaside, self.lientag]
+                print(f"le nouvel enregistrement est, pour la gestion du scraping : {listgestscrap}")
+                # envoie de listgestscrap dans la bdd
+                Gbdd.envoigestscrap(self, listgestscrap)
 
 
 Main()

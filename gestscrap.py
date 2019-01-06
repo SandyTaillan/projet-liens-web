@@ -1,20 +1,16 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 
 from bs4 import BeautifulSoup
 import requests
 import re
 
 
-class Scrap:
-    def scrapingurl(self, url):
-        """Cette fonction permet d'aller sur un site web et récupérer les données qui m'intéresse, à savoir :
+class Gestionlienscrap:
+    """Cette class va me permettre de gérer tout le scraping des sites web de ma BDD"""
 
-            lientitre   =   Titre du site
-            lienh1      =   Titre h1 du la page du site
-            lienh2      =   Titre h2
-            lienh3      =   Titre h3
-            lienh4      =   Titre h4
-            lienstrong  =   """
+    def __init__(self):
 
         self.lientitre = ""
         self.liendescr = ""
@@ -32,20 +28,41 @@ class Scrap:
         self.tag = []
         self.lientag = ""
 
+    def scraping(self, monurl):
+        """Cette fonction va me permettre de 'scraper' les liens en paramètre."""
+
+        self.lientitre = ""
+        self.liendescr = ""
+        self.lienh1 = ""
+        self.h2 = []
+        self.lienh2 = ""
+        self.h3 = []
+        self.lienh3 = ""
+        self.h4 = []
+        self.lienh4 = ""
+        self.strong = []
+        self.lienstrong = ""
+        self.aside = []
+        self.lienaside = ""
+        self.tag = []
+        self.lientag = ""
 
         print("lancement de la fonction de scraping")
-        reponse = requests.get(url)
+        reponse = requests.get(monurl)
         soup = BeautifulSoup(reponse.text, "html5lib")
 
-
+        # Récupération du titre
         self.lientitre = soup.title.string
+
+        # Récupération du h1
         self.lienh1 = soup.h1.string
-        # recherche de la description du site
+
+        # Récupération de la description
         for data in soup.find_all("header"):
             for mon_data in data.find_all("p", {"class": "site-description"}):
                 self.liendescr = mon_data.string
 
-        # Recherche de titres dans le partie section - content
+        # Récupération des titres de la partie "section - content"
         for data in soup.find_all("section", {"id": "content"}):
             # travail sur le h2
             for mon_data in data.find_all("h2"):
@@ -63,7 +80,6 @@ class Scrap:
             for mon_data in data.find_all("strong"):
                 self.strong.append(mon_data.get_text())
                 self.lienstrong = ','.join(self.strong)
-
         # Recherche des catégories
         for data in soup.find_all(class_=re.compile("cat")):
             for data1 in data.find_all("a"):
@@ -86,7 +102,5 @@ class Scrap:
         print(f"Les catégories : {self.lienaside}")
         print(f"Les tags : {self.lientag}")
 
-
-
-        return self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3, self.lienh4, self.lienstrong,\
-               self.lienaside, self.lientag
+        return self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3, self.lienh4, self.lienstrong, \
+        self.lienaside, self.lientag
