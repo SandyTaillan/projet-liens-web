@@ -52,10 +52,16 @@ class Gestionlienscrap:
         soup = BeautifulSoup(reponse.text, "html5lib")
 
         # Récupération du titre
-        self.lientitre = soup.title.string
+        try:
+            self.lientitre = soup.title.string
+        except AttributeError:
+            self.lientitre = ""
 
         # Récupération du h1
-        self.lienh1 = soup.h1.string
+        try:
+            self.lienh1 = soup.h1.string
+        except AttributeError:
+            self.lienh1 = ""
 
         # Récupération de la description
         for data in soup.find_all("header"):

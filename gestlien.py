@@ -2,6 +2,8 @@
 #
 
 import requests
+import urllib3
+
 
 class Gestionlienweb:
     """Cette classe regroupe toute la gestion des liens valides ou non."""
@@ -26,7 +28,7 @@ class Gestionlienweb:
             ajout_depre = 10
         except requests.exceptions.InvalidSchema:
             situation = "erreur: Schema invalid"
-            ajout_depre = 10
+            ajout_depre = 100
         except requests.exceptions.ReadTimeout:
             situation = "erreur: temps imparti"
             ajout_depre = 10
@@ -45,9 +47,17 @@ class Gestionlienweb:
         except requests.exceptions.ConnectionError:
             situation = "erreur: connection"
             ajout_depre = 10
-        except:
-            situation = "erreur: inconnue"
+        except requests.exceptions.TooManyRedirects:
+            situation = "erreur: Trop de redirection"
+            ajout_depre = 20
+        except requests.exceptions.RequestException:
+            situation = "erreur: erreur sur requests"
             ajout_depre = 10
+        except urllib3.exceptions.DecodeError:
+            situation = "erreur: problème de décodage"
+            ajout_depre = 20
+        # except:
+        #     situation = "Erreur: inconnue"
 
         depreciation = mondepre + ajout_depre
         print(f"la situation du lien est : {situation} avec une depréciation de {depreciation}")

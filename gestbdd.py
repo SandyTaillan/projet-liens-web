@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sqlite3
-import utils as utl
-from glob import glob
 import os
+import utils as utl
 import shutil
+from glob import glob
+import sqlite3
+
 
 class Gestionbdd:
+    """Cette classe regroupe toutes les fonctions qui concerne les base de données."""
+
     def __init__(self):
 
         # déclaration des variables
@@ -33,15 +36,11 @@ class Gestionbdd:
         print("Création de la bdd terminé")
 
     def trouvdosdefault(self):
-        """La base de données de Firefox se trouve dans un dossier qui peut changer de nom.
-        Il me faut donc chercher un dossier contenant le mot 'default' qui lui ne change pas.
-        English : The Firefox database is located in a folder that can change its name.
+        """The Firefox database is located in a folder that can change its name.
         So I have to look for a folder containing the word'default' that does not change it."""
 
         print("lancement fonction trouvdosdefault")
-
-        # copie de la BDD de firefox
-        # English : copy of the firefox database
+        # Copy of the firefox database
         fich = glob(utl.CHEMDBFF + "/*")
         for dossier in fich:
             if "default" in dossier:
@@ -49,20 +48,21 @@ class Gestionbdd:
                 shutil.copy(dosdefault, utl.CHCOPYBDD)
 
     def recupbddff(self):
-        """J'ai besoin de récupérer les données de la BDD de firefox. Seulement les données qui m'intéressent.
-            English : I need to recover the data from the firefox database. Only the data that interests me."""
+        """I need to recover the data from the firefox database. Only the data that interests me.
+        By removing strict duplicates."""
 
         print("lancement fonction recupbdd")
-
         # connexion à la copie de la  base de données firefox
         # English : connection to the copy of the firefox database
         connection = sqlite3.connect(utl.CHCOPYBDD)
         cursor = connection.cursor()
-        # récupération de l'id et de mes titres de liens en ne prenant pas ceux qui commencent par 'place:'
         # retrieving the id and my link titles by not taking those that start with'place:'.
-        cursor.execute("""SELECT moz_bookmarks.title, moz_places.url,  moz_places.description, moz_origins.prefix,
-         moz_origins.host FROM moz_bookmarks, moz_origins JOIN moz_places ON moz_places.id = moz_bookmarks.fk 
-         AND moz_places.origin_id = moz_origins.id WHERE moz_origins.prefix != 'place:'""")
+        cursor.execute("""
+        SELECT DISTINCT moz_bookmarks.title, moz_places.url,  moz_places.description, moz_origins.prefix,
+         moz_origins.host 
+         FROM moz_bookmarks, moz_origins JOIN moz_places ON moz_places.id = moz_bookmarks.fk 
+         AND moz_places.origin_id = moz_origins.id WHERE moz_origins.prefix != 'place:' 
+         AND moz_places.url != 'about:blank'""")
         self.ffdonn1 = cursor.fetchall()
 
         # Préparation du contenu de la table "gestion_erreur"
@@ -90,8 +90,7 @@ class Gestionbdd:
         connection.close()
 
     def envoidonneefirefox(self):
-        """ Après avoir récupérer uniquement les données dont j'ai besoin, je les envoie dans ma propre base de données.
-            English: After retrieving only the data I need, I send it to my own database."""
+        """After retrieving only the data I need, I send it to my own database."""
 
         print("lancement fonction envoidonneefirefox")
         # connection à la bdd interne
@@ -120,6 +119,7 @@ class Gestionbdd:
                         gestion_erreur.attente_suppression FROM gestion_erreur JOIN liens_meta 
                         ON gestion_erreur.id = liens_meta.id where gestion_erreur.situation != 'tout va bien'""")
         listgesterr = cursor.fetchall()
+        connection.close()
         return listgesterr
 
     def envoigesterreur(self, listgesterr):
@@ -149,6 +149,34 @@ class Gestionbdd:
                          WHERE ID = ?""", (listgestscrap[1], listgestscrap[2], listgestscrap[3], listgestscrap[4], 
                                            listgestscrap[5], listgestscrap[6], listgestscrap[7], listgestscrap[8],
                                            listgestscrap[9], listgestscrap[0]))
-
         connection.commit()
         connection.close()
+
+    def rechercheurl(self, monurl):
+        """On doit rechercher dans la BDD si l'URL a déjà été créé dans le but d'éviter les doublons."""
+
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute("""SELECT * FROM liens_meta WHERE url = ?""", (monurl,))
+        if len(cursor.fetchall()) == 0:
+            return 0
+        else:
+            return 1
+
+    def ajoutbdd(self, donnurl1, donnurl2, donnurl3):
+
+            print("lancement fonction d'ajout d'un enregistrement dans ma bdd.....")
+            # connection à la bdd interne
+            # English: connection to the internal database
+            connection = sqlite3.connect(utl.CHEMBD)
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO liens_meta(url, prefixe, host) VALUES(?,?,?)",
+                               donnurl1)
+
+            cursor.execute("""INSERT INTO gestion_erreur(situation, depreciation)
+                                VALUES(?,?)""", donnurl2)
+
+            cursor.execute("""INSERT INTO scraping(titre_scrap, description_scrap, h1, h2, h3, h4, strong,
+                 categories, mots_clefs) VALUES(?,?,?,?,?,?,?,?,?)""", donnurl3)
+            connection.commit()
+            connection.close()
