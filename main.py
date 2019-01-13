@@ -94,6 +94,9 @@ class Main(Gbdd):
         print("3 ------------------------- Vérifier la BDD de Firefox")
         print("4 ------------------------- Tri par rapport aux mot-clefs")
         print("5 ------------------------- Tri par rapport aux catégories")
+        print("6 ------------------------- lire toute la BDD")
+        print("7 ------------------------- Chercher avec un mot clef")
+        print("8 ------------------------- Montrer les catégories")
 
         repon = "o"
         while repon == "o":
@@ -102,6 +105,8 @@ class Main(Gbdd):
                 self.ajoutlien()
             elif reponse == "2":
                 self.supprlien()
+            elif reponse == "7":
+                self.cherchemotcle()
             repon = input('Voulez vous continuer ? O/N : ')
 
     def ajoutlien(self):
@@ -136,7 +141,16 @@ class Main(Gbdd):
             print("le lien existe déjà !")
 
     def supprlien(self):
-        pass
-    
-    
+        monurl = input("Lien à supprimer : ")
+        print("Recherche en cours pour savoir si le lien existe déjà dans la BDD")
+        marep = self.rechercheurl(monurl)
+        if marep == 0:
+            print("Le lien n'est pas dans la base de données.")
+        else:
+            Gbdd.supprimbdd(self, monurl)
+
+    def cherchemotcle(self):
+        motclef = input("Écrivez le mot que vous rechercher :")
+        marecherche = Gbdd.cherchebdd(self, motclef)
+        print(marecherche)
 Main()

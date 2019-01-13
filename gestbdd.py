@@ -165,18 +165,57 @@ class Gestionbdd:
 
     def ajoutbdd(self, donnurl1, donnurl2, donnurl3):
 
-            print("lancement fonction d'ajout d'un enregistrement dans ma bdd.....")
-            # connection à la bdd interne
-            # English: connection to the internal database
-            connection = sqlite3.connect(utl.CHEMBD)
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO liens_meta(url, prefixe, host) VALUES(?,?,?)",
-                               donnurl1)
+        print("lancement fonction d'ajout d'un enregistrement dans ma bdd.....")
+        # connection à la bdd interne
+        # English: connection to the internal database
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO liens_meta(url, prefixe, host) VALUES(?,?,?)",
+                           donnurl1)
 
-            cursor.execute("""INSERT INTO gestion_erreur(situation, depreciation)
-                                VALUES(?,?)""", donnurl2)
+        cursor.execute("""INSERT INTO gestion_erreur(situation, depreciation)
+                            VALUES(?,?)""", donnurl2)
 
-            cursor.execute("""INSERT INTO scraping(titre_scrap, description_scrap, h1, h2, h3, h4, strong,
-                 categories, mots_clefs) VALUES(?,?,?,?,?,?,?,?,?)""", donnurl3)
+        cursor.execute("""INSERT INTO scraping(titre_scrap, description_scrap, h1, h2, h3, h4, strong,
+             categories, mots_clefs) VALUES(?,?,?,?,?,?,?,?,?)""", donnurl3)
+        connection.commit()
+        connection.close()
+
+    def supprimbdd(self, monurl):
+
+        print("lancement fonction d'une suppression d'un enregistrement dans ma bdd.....")
+        # connection à la bdd interne
+        # English: connection to the internal database
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute("""SELECT * FROM liens_meta WHERE url = ?""", (monurl,))
+        repenr = cursor.fetchone()
+        print(repenr)
+        print("le lien à supprimer est :")
+        print(f"id : {repenr[0]} | url : {repenr[2]}")
+        accept = input(f"êtes-vous sûr de vouloir supprimer le lien ?")
+        if accept == "o":
+            cursor.execute("""DELETE FROM liens_meta WHERE id = ?""", (repenr[0],))
+            cursor.execute("DELETE FROM gestion_erreur WHERE id = ?", (repenr[0],))
+            cursor.execute("DELETE FROM scraping WHERE id =?", (repenr[0],))
+            print("Enregistrement supprimé")
             connection.commit()
             connection.close()
+        else:
+            print("Le lien n'a pas été supprimé")
+
+    def cherchebdd(self, motclef):
+
+        print("lancement fonction d'une recherche d'un enregistrement dans ma bdd.....")
+        # connection à la bdd interne
+        # English: connection to the internal database
+        motclef = "%" + motclef + "%"
+
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute(""" SELECT * FROM liens_meta WHERE url LIKE ? """, (motclef, ))
+        marecherche = cursor.fetchall()
+        connection.commit()
+        connection.close()
+        return marecherche
+
