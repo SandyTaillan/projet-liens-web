@@ -94,7 +94,7 @@ class Main(Gbdd):
         print("3 ------------------------- Vérifier la BDD de Firefox")
         print("4 ------------------------- Tri par rapport aux mot-clefs")
         print("5 ------------------------- Tri par rapport aux catégories")
-        print("6 ------------------------- lire toute la BDD")
+        print("6 ------------------------- lire la BDD")
         print("7 ------------------------- Chercher avec un mot clef")
         print("8 ------------------------- Montrer les catégories")
 
@@ -107,6 +107,8 @@ class Main(Gbdd):
                 self.supprlien()
             elif reponse == "7":
                 self.cherchemotcle()
+            elif reponse == "6":
+                self.liretoutebdd()
             repon = input('Voulez vous continuer ? O/N : ')
 
     def ajoutlien(self):
@@ -153,4 +155,26 @@ class Main(Gbdd):
         motclef = input("Écrivez le mot que vous rechercher :")
         marecherche = Gbdd.cherchebdd(self, motclef)
         print(marecherche)
+
+    def liretoutebdd(self):
+        """Affichage de la bdd complète ou partielle."""
+
+        print("1 -------------------- Affichage du host, de l'URL et du titre")
+        print("2 -------------------- Affichage  du host, de l'url, de la situation, depreciation, attente supression")
+        print("3 -------------------- Affichage du titre et du scraping")
+        repon = "o"
+        while repon == "o":
+            reponse = input("Que voulez-vous afficher ?")
+            if reponse == "1":
+                affichlist1 = Gbdd.recupbddaffich1(self)
+                print("  id  |      host       |          url                                       |            "
+                      "             titre                        ")
+                for i in affichlist1:
+                    print(f"{i[0]}   |   {i[1]}   |   {i[2]}   |   {i[3]}")
+            elif reponse == "2":6
+                pass
+            elif reponse == "3":
+                pass
+            repon = input('Voulez vous continuer ? O/N : ')
+
 Main()

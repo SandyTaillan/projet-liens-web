@@ -219,3 +219,10 @@ class Gestionbdd:
         connection.close()
         return marecherche
 
+    def recupbddaffich1(self, ):
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute(""" SELECT id, host, url, titre  FROM liens_meta""")
+        affichlist1 = cursor.fetchall()
+        connection.close()
+        return affichlist1
