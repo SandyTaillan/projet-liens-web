@@ -18,9 +18,10 @@ import utils as utl
 from gestbdd import Gestionbdd as Gbdd
 from gestlien import Gestionlienweb as Glw
 from gestscrap import Gestionlienscrap as Glsc
+from interface import Gui_gestionlien as Ggl
 
 
-class Main(Gbdd):
+class Main(Gbdd, Ggl):
     def __init__(self):
         super(Main, self).__init__()
         
@@ -167,14 +168,30 @@ class Main(Gbdd):
             reponse = input("Que voulez-vous afficher ?")
             if reponse == "1":
                 affichlist1 = Gbdd.recupbddaffich1(self)
-                print("  id  |      host       |          url                                       |            "
+                print("        host        |                   url                                       |      Titre "
                       "             titre                        ")
                 for i in affichlist1:
-                    print(f"{i[0]}   |   {i[1]}   |   {i[2]}   |   {i[3]}")
-            elif reponse == "2":6
-                pass
+                    print(f"{i[0]}   |   {i[1]}   |   {i[2]}   |   ")
+            elif reponse == "2":
+                affichlist2 = Gbdd.recupbddaffich2(self)
+                print("          host         |          url                                       |      "
+                      " situation         | Depreciation | suppression")
+                for i in affichlist2:
+                    print(f"{i[0]}   |   {i[1]}   |   {i[2]}   | {i[3]}  | {i[4]}")
             elif reponse == "3":
-                pass
+                affichlist3 = Gbdd.recupbddaffich3(self)
+                print("        url        |                   titre_scrap                           | description_scrap"
+                      "    |        h1                        |               h2                 |              h3"
+                      "           |               h4              |            strong               |                "
+                      "    mots_clef      |            catégorie               |                  mes_mots_clefs     |")
+                for i in affichlist3:
+                    print(f"{i[0]} |   {i[1]} |   {i[2]}  |  {i[3]}  |  {i[4]} |   {i[5]} |   {i[6]}  |  {i[7]}  | "
+                          f" {i[8]} |   {i[9]} |   {i[10]} ")
             repon = input('Voulez vous continuer ? O/N : ')
 
-Main()
+
+
+app = QtWidgets.QApplication([])
+fenetreprincipale = main()
+fenetreprincipale.show()
+app.exec_()
