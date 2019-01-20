@@ -81,6 +81,8 @@ class Gestionbdd:
         strong = ""
         categories = ""
         mots_clefs = ""
+        self.ffdonn2 = []
+        self.ffdonn3 = []
 
         for i in range(1, (len(self.ffdonn1) + 1)):
             self.ffdonn2.append([i, situation, depreciation, suppression])
@@ -219,10 +221,38 @@ class Gestionbdd:
         connection.close()
         return marecherche
 
-    def recupbddaffich1(self, ):
+    def recupbddaffich1(self):
         connection = sqlite3.connect(utl.CHEMBD)
         cursor = connection.cursor()
-        cursor.execute(""" SELECT id, host, url, titre  FROM liens_meta""")
+        cursor.execute(""" SELECT host, url, titre  FROM liens_meta""")
         affichlist1 = cursor.fetchall()
+        cursor.execute("""SELECT COUNT (*) FROM liens_meta""")
+        comptenregist = cursor.fetchone()
+
         connection.close()
-        return affichlist1
+        return affichlist1, comptenregist
+
+    def recupbddaffich2(self):
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute("""SELECT liens_meta.host, liens_meta.url,  gestion_erreur.situation,
+                            gestion_erreur.depreciation, gestion_erreur.attente_suppression
+                        FROM liens_meta
+                        JOIN gestion_erreur ON liens_meta.id = gestion_erreur.id
+                        ORDER BY gestion_erreur.depreciation DESC """)
+        affichlist2 = cursor.fetchall()
+        connection.close()
+        return affichlist2
+
+    def recupbddaffich3(self):
+        connection = sqlite3.connect(utl.CHEMBD)
+        cursor = connection.cursor()
+        cursor.execute("""SELECT liens_meta.url, scraping.titre_scrap, scraping.description_scrap, scraping.h1,
+                        scraping.h2, scraping.h3, scraping.h4, scraping.strong, scraping.mots_clefs,
+                         scraping.categories, scraping.mes_mots_clefs
+                        FROM scraping
+                        JOIN liens_meta ON liens_meta.id = scraping.id
+                        ORDER BY liens_meta.host """)
+        affichlist3 = cursor.fetchall()
+        connection.close()
+        return affichlist3

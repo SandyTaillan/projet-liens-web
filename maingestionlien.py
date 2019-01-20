@@ -13,17 +13,19 @@
 
 # English : import of modules
 import os
+from PySide2 import QtWidgets
 # importation of others files of this programme
 import utils as utl
 from gestbdd import Gestionbdd as Gbdd
 from gestlien import Gestionlienweb as Glw
 from gestscrap import Gestionlienscrap as Glsc
-from interface import Gui_gestionlien as Ggl
+from interface.interprin import Interprin
+from interface.interdemar import Interdemar
 
 
-class Main(Gbdd, Ggl):
+class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
     def __init__(self):
-        super(Main, self).__init__()
+        super(Maingestionlien, self).__init__()
         
         self.lientitre = ""
         self.liendescr = ""
@@ -41,9 +43,13 @@ class Main(Gbdd, Ggl):
         self.tag = []
         self.lientag = ""
 
+        # lancement de l'interface principale
+
+        self.setupuiprin(self)
         # English : check if my database exists if it doesn't, it is created.
         if not os.path.isfile(utl.CHEMBD):
-            print("Dans le main :\ndemande de création de la bdd")
+            self.setupuidemar(self)
+            print("Dans maingestionlien :\ndemande de création de la bdd")
             Gbdd.creabd(self)
             # Trouver le dossier contenant la base de données de Firefox (son nom varie)
             # English : Find the folder containing the Firefox database (its name varies)
@@ -59,7 +65,8 @@ class Main(Gbdd, Ggl):
             self.interface()
         else:
             print("Dans le main : \nla base de données existe bien")
-            self.interface()
+            self.affichbdd_hut()
+            #self.interface()
 
     def majbdd(self):
         """Fonction pour vérifier les liens et faire le scraping à la création de la BDD"""
@@ -88,6 +95,41 @@ class Main(Gbdd, Ggl):
                 print(f"le nouvel enregistrement est, pour la gestion du scraping : {listgestscrap}")
                 # envoie de listgestscrap dans la bdd
                 Gbdd.envoigestscrap(self, listgestscrap)
+
+    def affichbdd_hut(self):
+        """Corrélation entre l'interface graphique et la BDD pour afficher :
+            hut  = host - url - titre
+            listcolonne = liste -> intitulé colonne de la Base de Donnée à envoyer dans QtableWidget
+            """
+
+        # envoyer le nombre de colonne, de ligne, envoyer les intitulés, envoyer la liste de la BDD à afficher
+        listcolonne = ["host", "url", "titre"]
+        affichlist1, comptenregist = Gbdd.recupbddaffich1(self)
+
+        # Création des colonnes
+        self.tablewidget.setColumnCount(len(listcolonne))
+        # Détermination des dimensions des colonnes
+        self.tablewidget.setColumnWidth(0, 200)
+        self.tablewidget.setColumnWidth(1, 700)
+        self.tablewidget.setColumnWidth(2, 750)
+
+
+
+        # mettre un nom au colonne
+        for nbre, nom in enumerate(listcolonne):
+            self.tablewidget.setHorizontalHeaderItem(nbre, QtWidgets.QTableWidgetItem())
+            # Attention, tout envoie de texte devrait être encodé en UTF8
+            self.tablewidget.horizontalHeaderItem(nbre).setText(nom)
+
+        # affichage du conetnu de ma BDD
+        self.tablewidget.setRowCount(int(comptenregist[0]))
+        for numligne, ligneenregist in enumerate(affichlist1):
+            # mise en place d'une taille pour les lignes
+            self.tablewidget.setRowHeight(numligne, 20)
+            for numcolonne, enregistrement in enumerate(ligneenregist):
+                self.tablewidget.setItem(numligne, numcolonne,
+                                                         QtWidgets.QTableWidgetItem(enregistrement))
+
 
     def interface(self):
         print("1 ------------------------- Ajouter un lien")
@@ -190,8 +232,7 @@ class Main(Gbdd, Ggl):
             repon = input('Voulez vous continuer ? O/N : ')
 
 
-
 app = QtWidgets.QApplication([])
-fenetreprincipale = main()
-fenetreprincipale.show()
+fenetre = Maingestionlien()
+fenetre.show()
 app.exec_()
