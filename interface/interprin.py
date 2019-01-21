@@ -5,6 +5,7 @@ from PySide2 import QtWidgets
 from PySide2 import QtCore
 
 
+
 class Interprin:
 
     def setupuiprin(self, fenetreprincipale):
@@ -20,24 +21,51 @@ class Interprin:
         fenetreprincipale.addTab(self.fenetregestionlien, "Gestion des liens")
         fenetreprincipale.addTab(self.fenetregestiontemps, "Gestion emploi du temps")
 
-        # mise en place d'un layout sur les onglets
+        # mise en place d'un layout sur un onglet
         self.gridlayout1 = QtWidgets.QGridLayout(self.fenetregestionlien)
 
         # création d'un widget QtableWidget appelé tablewidget
         self.tablewidget = QtWidgets.QTableWidget(self.fenetregestionlien)
+
         # Je met le tablewidget dans le gridlayout1
-        self.gridlayout1.addWidget(self.tablewidget, 2, 0, 8, 8)
+        self.gridlayout1.addWidget(self.tablewidget, 1, 0, 1, 8)
+
         # création d'un widget groupbox appelé gb_url
-        self.gb_url = QtWidgets.QGroupBox(self.fenetregestionlien)
+        self.gb_url = QtWidgets.QGroupBox("Les url", self.fenetregestionlien)
+        # alignement du groupbox gb_url
+        self.gb_url.setAlignment(QtCore.Qt.AlignCenter)
+
         # Je met le groupbox gb_url dans le gridlayout
-        self.gridlayout1.addWidget(self.gb_url, 0, 0, 2, 4)
+        self.gridlayout1.addWidget(self.gb_url, 0, 0, 1, 1)
+
+        # mise en place d'un gridlayout sur le groubox des url
+        self.gridlayout2 = QtWidgets.QGridLayout(self.gb_url)
+
+
+        # création d'un Qpushbutton pour ajouter une url : btn_ajouturl
+        self.btn_ajouturl = QtWidgets.QPushButton("Ajouter", self.fenetregestionlien)
+        # création d'un Qpushbutton pour supprimer une url : btn_supprurl
+        self.btn_supprurl = QtWidgets.QPushButton("supprimer", self.fenetregestionlien)
+
+        # ajout du bouton btn_ajouturl au layout verticalayout1
+        self.gridlayout2.addWidget(self.btn_ajouturl, 0, 0, 1, 1)
+        # ajout du bouton btn_suppr_url au layout verticalayout1
+        self.gridlayout2.addWidget(self.btn_supprurl, 0, 1, 1, 1)
+
+
 
         self.tablewidget.setGeometry(QtCore.QRect(10, 100, 1600, 800))
         # Faire que le texte des enregistrements déborde des colonnes
         # et ne retourne pas à la ligne dans le même enregistrement
         self.tablewidget.setWordWrap(False)
+        # permettre un tri en cliquant sur la colonne
+        self.tablewidget.setSortingEnabled(True)
+        self.tablewidget.sortByColumn(0)
+
+        # création d'un label pour y mettre mes prints de suivi
+        self.laprincipal1 = QtWidgets.QLabel(self.fenetregestionlien)
+        self.gridlayout1.addWidget(self.laprincipal1, 3, 0, 1, 3)
+        self.laprincipal1.setText("Prêt")
 
 
-
-        fenetreprincipale.show()
 

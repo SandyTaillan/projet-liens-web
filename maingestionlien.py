@@ -62,10 +62,11 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             Gbdd.envoidonneefirefox(self)
             # Vérification de la validité des liens et su scraping
             self.majbdd()
-            self.interface()
+            #self.interface()
         else:
-            print("Dans le main : \nla base de données existe bien")
-            self.affichbdd_hut()
+            self.laprincipal1.setText("La base de donnée existe ....")
+        self.affichbdd_hut()
+        self.connectioninterface()
             #self.interface()
 
     def majbdd(self):
@@ -96,6 +97,15 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
                 # envoie de listgestscrap dans la bdd
                 Gbdd.envoigestscrap(self, listgestscrap)
 
+
+    def connectioninterface(self):
+        """ Pour connecter l'interface (via les boutons) à la gestion de la BDD"""
+
+        self.btn_ajouturl.clicked.connect(self.uiajouturl)
+        self.btn_supprurl.clicked.connect(self.supprlien)
+
+
+
     def affichbdd_hut(self):
         """Corrélation entre l'interface graphique et la BDD pour afficher :
             hut  = host - url - titre
@@ -113,15 +123,13 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         self.tablewidget.setColumnWidth(1, 700)
         self.tablewidget.setColumnWidth(2, 750)
 
-
-
         # mettre un nom au colonne
         for nbre, nom in enumerate(listcolonne):
             self.tablewidget.setHorizontalHeaderItem(nbre, QtWidgets.QTableWidgetItem())
             # Attention, tout envoie de texte devrait être encodé en UTF8
             self.tablewidget.horizontalHeaderItem(nbre).setText(nom)
 
-        # affichage du conetnu de ma BDD
+        # affichage du contenu de ma BDD
         self.tablewidget.setRowCount(int(comptenregist[0]))
         for numligne, ligneenregist in enumerate(affichlist1):
             # mise en place d'une taille pour les lignes
@@ -129,7 +137,7 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             for numcolonne, enregistrement in enumerate(ligneenregist):
                 self.tablewidget.setItem(numligne, numcolonne,
                                                          QtWidgets.QTableWidgetItem(enregistrement))
-
+        self.laprincipal1.setText("Affichage du contenu de la BDD en cours .....")
 
     def interface(self):
         print("1 ------------------------- Ajouter un lien")
@@ -155,12 +163,21 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             repon = input('Voulez vous continuer ? O/N : ')
 
     def ajoutlien(self):
-        monurl = input("Lien à rajouter : ")
+        """Cette fonction permet de rajouter un lien à la BDD grâce à l'intrface graphique.
+            Une fois que l'url a été saisie et validée, le programme va chercher dans la BDD
+            si l'url existe déjà. Si ce n'est pas le cas, l'url est rajouté à la BDD
+            et le programme rempli les renseignements manquants."""
+
+        # récupération de l'url ajoutée
+        monurl = self.leiau1.text()
+        self.fenetreajouturl.close()
+        self.laprincipal1.setText("Récupération de l'url que l'on souhaite ajouter à la BDD")
         print("Recherche en cours pour savoir si le lien existe déjà dans la BDD")
+        # Envoi de l'url saisie par l'utilisateur dans la fonction de recherche d'url dans la BDD
         marep = self.rechercheurl(monurl)
         if marep == 0:
+            # Si le lien n'est pas dans la base de données, le logiciel va chercher à remplir les cases manquantes pour remplir la BDD
             print("Le lien n'est pas dans la base de données.")
-
             print("Recherche prefixe et host.....")
             hachurl = monurl.split("/")
             prefixeurl = hachurl[0] + "//"
@@ -231,6 +248,8 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
                           f" {i[8]} |   {i[9]} |   {i[10]} ")
             repon = input('Voulez vous continuer ? O/N : ')
 
+    def essai(self):
+        print("cela fonctionne")
 
 app = QtWidgets.QApplication([])
 fenetre = Maingestionlien()
