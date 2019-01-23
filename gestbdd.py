@@ -5,9 +5,9 @@ import utils as utl
 import shutil
 from glob import glob
 import sqlite3
+from interface.interdemar import Interdemar
 
-
-class Gestionbdd:
+class Gestionbdd(Interdemar):
     """Cette classe regroupe toutes les fonctions qui concerne les base de données."""
 
     def __init__(self):
@@ -193,10 +193,11 @@ class Gestionbdd:
         cursor.execute("""SELECT * FROM liens_meta WHERE url = ?""", (monurl,))
         repenr = cursor.fetchone()
         print(repenr)
-        print("le lien à supprimer est :")
-        print(f"id : {repenr[0]} | url : {repenr[2]}")
-        accept = input(f"êtes-vous sûr de vouloir supprimer le lien ?")
-        if accept == "o":
+        accept = self.lienasupprimer(monurl)
+        # print("le lien à supprimer est :")
+        # print(f"id : {repenr[0]} | url : {repenr[2]}")
+        # accept = input(f"êtes-vous sûr de vouloir supprimer le lien ?")
+        if accept == 1:
             cursor.execute("""DELETE FROM liens_meta WHERE id = ?""", (repenr[0],))
             cursor.execute("DELETE FROM gestion_erreur WHERE id = ?", (repenr[0],))
             cursor.execute("DELETE FROM scraping WHERE id =?", (repenr[0],))

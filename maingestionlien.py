@@ -10,7 +10,8 @@
 # todo : Avoir la possibilité de donner soi-même des mots-clés et catégories.
 # todo : Pouvoir faire un tri par rapport au mot-clef, catégorie, et ma propre demande de recherche.
 # todo : À la création de ma DBB, je créé un fichier places.squite qui est la copie de la BDD de Firefox. En faire un fichier temporaire.
-
+# todo : Les fonctions supprlien et cellclick ne sont pas du tout optimiser. Changer cela.
+# todo : Lorsque j'ajoute un lien, j'ai bien modifié ma BDD mais je n'ai pas modifié l'affichage dans QTabWidget
 # English : import of modules
 import os
 from PySide2 import QtWidgets
@@ -67,7 +68,6 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             self.laprincipal1.setText("La base de donnée existe ....")
         self.affichbdd_hut()
         self.connectioninterface()
-            #self.interface()
 
     def majbdd(self):
         """Fonction pour vérifier les liens et faire le scraping à la création de la BDD"""
@@ -140,7 +140,6 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         self.laprincipal1.setText("Affichage du contenu de la BDD en cours .....")
 
     def interface(self):
-        print("1 ------------------------- Ajouter un lien")
         print("2 ------------------------- Supprimer un lien")
         print("3 ------------------------- Vérifier la BDD de Firefox")
         print("4 ------------------------- Tri par rapport aux mot-clefs")
@@ -152,9 +151,7 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         repon = "o"
         while repon == "o":
             reponse = input("Que voulez-vous faire ?")
-            if reponse == "1":
-                self.ajoutlien()
-            elif reponse == "2":
+            if reponse == "2":
                 self.supprlien()
             elif reponse == "7":
                 self.cherchemotcle()
@@ -172,21 +169,23 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         monurl = self.leiau1.text()
         self.fenetreajouturl.close()
         self.laprincipal1.setText("Récupération de l'url que l'on souhaite ajouter à la BDD")
-        print("Recherche en cours pour savoir si le lien existe déjà dans la BDD")
+
         # Envoi de l'url saisie par l'utilisateur dans la fonction de recherche d'url dans la BDD
         marep = self.rechercheurl(monurl)
         if marep == 0:
             # Si le lien n'est pas dans la base de données, le logiciel va chercher à remplir les cases manquantes pour remplir la BDD
-            print("Le lien n'est pas dans la base de données.")
+            self.laprincipal1.setText("Tout est ok, le lien n'est pas déjà dans la BDD")
             print("Recherche prefixe et host.....")
             hachurl = monurl.split("/")
             prefixeurl = hachurl[0] + "//"
             hosturl = hachurl[2]
-            print(f"Le prefixe de l'url est {prefixeurl} et son host est {hosturl}")
+            # print(f"Le prefixe de l'url est {prefixeurl} et son host est {hosturl}")
             donnurl1 = [monurl, prefixeurl, hosturl]
-            print("Recherche de la validité du lien......")
+            self.laprincipal1.setText("Recherche de la validité du lien ....")
             situation, depreciation = Glw.veriflien(self, monurl, mondepre=0)
-            print(f"La situation du lien est : {situation} et sa dépréciation vaut : {depreciation}")
+            self.laprincipal1.setText(
+                f"La situation du lien est : {situation} et sa dépréciation vaut : {depreciation}")
+
             donnurl2 = [situation, depreciation]
             print("Recherche d'informations sur le site.....")
             if situation == "tout va bien":
@@ -194,22 +193,29 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
                 self.lienaside, self.lientag = Glsc.scraping(self, monurl)
                 donnurl3 = [self.lientitre, self.liendescr, self.lienh1, self.lienh2, self.lienh3,
                                  self.lienh4, self.lienstrong, self.lienaside, self.lientag]
-                print(f"le nouvel enregistrement est, pour la gestion du scraping : {donnurl3}")
+                self.laprincipal1.setText(f"le nouvel enregistrement est, pour la gestion du scraping : {donnurl3}")
                 print("lancement de la fonction pou ajouter un lien .......")
                 Gbdd.ajoutbdd(self, donnurl1, donnurl2, donnurl3)
             else:
-                print("Désolé, le lien est corrumpu")
+                self.lienmessagerapide("Le lien est corrumpu et ne sera pas pris en compte")
         else:
-            print("le lien existe déjà !")
+            self.lienmessagerapide("Le lien existe déjà")
 
     def supprlien(self):
-        monurl = input("Lien à supprimer : ")
-        print("Recherche en cours pour savoir si le lien existe déjà dans la BDD")
+
+        row = self.tablewidget.currentRow()
+        col = 1  # colonne de l'url
+        item = self.tablewidget.item(row, col)
+        # self.tablewidget.cellClicked.connect(self.cellclick)
+        monurl = item.text()
+
         marep = self.rechercheurl(monurl)
         if marep == 0:
             print("Le lien n'est pas dans la base de données.")
         else:
+            print("Le lien est dans la BDD")
             Gbdd.supprimbdd(self, monurl)
+            self.tablewidget.removeRow(row)
 
     def cherchemotcle(self):
         motclef = input("Écrivez le mot que vous rechercher :")

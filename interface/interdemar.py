@@ -25,7 +25,7 @@ class Interdemar:
         fenetredemarrage.exec_()
 
 
-    def uiajouturl(self, QDialog):
+    def uiajouturl(self):
         """Fenêtre permettant de rajouter une url dans la BDD
             gliau1 = gridlayout1 de cette fonction
             laiau1 = Label 1 de cette fonction
@@ -79,3 +79,34 @@ class Interdemar:
         self.btn_iau1.clicked.connect(self.ajoutlien)
 
         self.fenetreajouturl.show()
+
+    def lienmessagerapide(self, textmessagerapide):
+        """Interface graphique qui indique que le lien donné par l'utilisateur est corrompu"""
+        # création de la fenêtre
+        self.fenetremessrapide = QtWidgets.QMessageBox(self.fenetregestionlien)
+        self.fenetremessrapide.setWindowTitle("Information")
+        self.fenetremessrapide.setModal(True)
+        self.fenetremessrapide.setText(textmessagerapide)
+
+        self.fenetremessrapide.show()
+
+    def lienasupprimer(self, monurl):
+        """Fonction permettant de vérifier si le lien est bien le lien à supprimer"""
+
+        self.lienasuppr = QtWidgets.QMessageBox(self.fenetregestionlien)
+        self.lienasuppr.setGeometry(500, 300, 300, 100)
+        self.lienasuppr.setModal(True)
+        self.lienasuppr.setWindowTitle("Vérification")
+
+        self.lienasuppr.setText(f"êtes-vous sûr de vouloir supprimer ce lien : \n {monurl}")
+        # modifier les boutons
+        # button1 = QtWidgets.QMessageBox.Yes(self.lienasuppr, "oui")
+        # button2 = QtWidgets.QMessageBox.No(self.lienasuppr, "non")
+        self.lienasuppr.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        self.lienasuppr.setDefaultButton(QtWidgets.QMessageBox.Yes)
+        # lancement de la fenêtre
+        accept = self.lienasuppr.exec_()
+        if accept == QtWidgets.QMessageBox.Yes:
+            return 1
+        else:
+            return 0
