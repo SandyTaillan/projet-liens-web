@@ -41,7 +41,6 @@ class Interprin:
         # mise en place d'un gridlayout sur le groubox des url
         self.gridlayout2 = QtWidgets.QGridLayout(self.gb_url)
 
-
         # création d'un Qpushbutton pour ajouter une url : btn_ajouturl
         self.btn_ajouturl = QtWidgets.QPushButton("Ajouter", self.fenetregestionlien)
         # création d'un Qpushbutton pour supprimer une url : btn_supprurl
@@ -52,7 +51,24 @@ class Interprin:
         # ajout du bouton btn_suppr_url au layout verticalayout1
         self.gridlayout2.addWidget(self.btn_supprurl, 0, 1, 1, 1)
 
+        # Création d'un groupbox appelé gb_recherche
+        self.gb_recherche = QtWidgets.QGroupBox("Recherche", self.fenetregestionlien)
+        # alignement du groupbox gb_recherche
+        self.gb_recherche.setAlignment(QtCore.Qt.AlignCenter)
+        # Je met le groubox gb_recherche dans le gridlayout
+        self.gridlayout1.addWidget(self.gb_recherche, 0, 1, 1, 1)
 
+        # mise en place d'un gridlayout sur le groubox des url
+        self.gridlayout3 = QtWidgets.QGridLayout(self.gb_recherche)
+
+        # création d'un bouton btn_motcle pour faire une recherche par mot-cle
+        self.btn_motcle = QtWidgets.QPushButton("Mot-clefs", self.fenetregestionlien)
+        # Création d'un bouton btn_categories pour faire une recherche par categorie
+        self.btn_categories = QtWidgets.QPushButton("Catégories", self.fenetregestionlien)
+        # ajout du bouton btn_motcle au groupbox recherche
+        self.gridlayout3.addWidget(self.btn_motcle, 0, 0, 1, 1)
+        # ajout du bouton btn_categories au groupbox recherche
+        self.gridlayout3.addWidget(self.btn_categories, 0, 1, 1, 1)
 
         self.tablewidget.setGeometry(QtCore.QRect(10, 100, 1600, 800))
         # Faire que le texte des enregistrements déborde des colonnes

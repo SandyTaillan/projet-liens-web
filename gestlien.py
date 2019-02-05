@@ -15,10 +15,13 @@ class Gestionlienweb:
         # variable declaration
         situation = ""
         ajout_depre = 0
+        listhttp_1 = [201, 202, 203, 204, 205, 206, 207, 208, 210, 226]
 
         try:
             r = requests.get(monurl, timeout=7)
             if r.status_code == requests.codes.ok:
+                situation = "tout va bien"
+            elif r.status_code in listhttp_1:
                 situation = "tout va bien"
         except requests.exceptions.SSLError:
             situation = "erreur: ssl"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-# todo : gérer les url doublons
+# todo : Fait ! gérer les url doublons
 # todo : Il semble que la situation "tout va bien" lié au statut code ne prends pas en ccmpte tous les cas ou la connection est correcte.
 # todo : Pour les liens non valides : les retester à intervalle régulier.
 # todo : pour les liens valides : faire du web scraping pour récolter les données souhaitées.
@@ -66,7 +66,7 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             #self.interface()
         else:
             self.laprincipal1.setText("La base de donnée existe ....")
-        self.affichbdd_hut()
+        self.selectbdd_hut()
         self.connectioninterface()
 
     def majbdd(self):
@@ -103,18 +103,22 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
 
         self.btn_ajouturl.clicked.connect(self.uiajouturl)
         self.btn_supprurl.clicked.connect(self.supprlien)
+        self.btn_motcle.clicked.connect(self.cherchemotcle)
 
+    def selectbdd_hut(self):
 
+        affichlist1, comptenregist = Gbdd.recupbddaffich1(self)
+        print(f"affichlist1: {affichlist1}")
+        self.affichbdd_hut(affichlist1, comptenregist)
 
-    def affichbdd_hut(self):
+    def affichbdd_hut(self, affichlist1, comptenregist):
         """Corrélation entre l'interface graphique et la BDD pour afficher :
             hut  = host - url - titre
             listcolonne = liste -> intitulé colonne de la Base de Donnée à envoyer dans QtableWidget
             """
 
-        # envoyer le nombre de colonne, de ligne, envoyer les intitulés, envoyer la liste de la BDD à afficher
+        # envoyer le nombre de colonne, envoyer les intitulés, envoyer la liste de la BDD à afficher
         listcolonne = ["host", "url", "titre"]
-        affichlist1, comptenregist = Gbdd.recupbddaffich1(self)
 
         # Création des colonnes
         self.tablewidget.setColumnCount(len(listcolonne))
@@ -140,7 +144,7 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         self.laprincipal1.setText("Affichage du contenu de la BDD en cours .....")
 
     def interface(self):
-        print("2 ------------------------- Supprimer un lien")
+
         print("3 ------------------------- Vérifier la BDD de Firefox")
         print("4 ------------------------- Tri par rapport aux mot-clefs")
         print("5 ------------------------- Tri par rapport aux catégories")
@@ -151,9 +155,8 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
         repon = "o"
         while repon == "o":
             reponse = input("Que voulez-vous faire ?")
-            if reponse == "2":
-                self.supprlien()
-            elif reponse == "7":
+
+            if reponse == "7":
                 self.cherchemotcle()
             elif reponse == "6":
                 self.liretoutebdd()
@@ -196,6 +199,16 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
                 self.laprincipal1.setText(f"le nouvel enregistrement est, pour la gestion du scraping : {donnurl3}")
                 print("lancement de la fonction pou ajouter un lien .......")
                 Gbdd.ajoutbdd(self, donnurl1, donnurl2, donnurl3)
+                # ajout d'un enregistrement au QTableView pour l'interface courte. Voir pour les autres interfaces.
+                row = (self.tablewidget.rowCount())
+                self.tablewidget.insertRow(row)
+                column = (self.tablewidget.columnCount())
+
+                print(f"row : {row}, column : {column} ")
+                self.tablewidget.setItem(row, 0, QtWidgets.QTableWidgetItem(donnurl1[2]))
+                self.tablewidget.setItem(row, 1, QtWidgets.QTableWidgetItem(donnurl1[0]))
+                self.tablewidget.setItem(row, 2, QtWidgets.QTableWidgetItem(donnurl3[0]))
+
             else:
                 self.lienmessagerapide("Le lien est corrumpu et ne sera pas pris en compte")
         else:
@@ -218,9 +231,10 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
             self.tablewidget.removeRow(row)
 
     def cherchemotcle(self):
-        motclef = input("Écrivez le mot que vous rechercher :")
-        marecherche = Gbdd.cherchebdd(self, motclef)
-        print(marecherche)
+
+        motclef = Interdemar.uirecherchemotcle(self, self.fenetregestionlien)
+        affichlist1, comptenregist = Gbdd.cherchebdd1(self, motclef)
+        self.affichbdd_hut(affichlist1, comptenregist)
 
     def liretoutebdd(self):
         """Affichage de la bdd complète ou partielle."""
@@ -254,8 +268,6 @@ class Maingestionlien(QtWidgets.QTabWidget, Gbdd, Interprin, Interdemar):
                           f" {i[8]} |   {i[9]} |   {i[10]} ")
             repon = input('Voulez vous continuer ? O/N : ')
 
-    def essai(self):
-        print("cela fonctionne")
 
 app = QtWidgets.QApplication([])
 fenetre = Maingestionlien()

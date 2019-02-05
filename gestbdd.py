@@ -51,6 +51,9 @@ class Gestionbdd(Interdemar):
         """I need to recover the data from the firefox database. Only the data that interests me.
         By removing strict duplicates."""
 
+        self.ffdonn1 = []
+        ffdonnbisbis = []
+
         print("lancement fonction recupbdd")
         # connexion à la copie de la  base de données firefox
         # English : connection to the copy of the firefox database
@@ -58,12 +61,18 @@ class Gestionbdd(Interdemar):
         cursor = connection.cursor()
         # retrieving the id and my link titles by not taking those that start with'place:'.
         cursor.execute("""
-        SELECT DISTINCT moz_bookmarks.title, moz_places.url,  moz_places.description, moz_origins.prefix,
+        SELECT moz_bookmarks.title, moz_places.url,  moz_places.description, moz_origins.prefix,
          moz_origins.host 
          FROM moz_bookmarks, moz_origins JOIN moz_places ON moz_places.id = moz_bookmarks.fk 
          AND moz_places.origin_id = moz_origins.id WHERE moz_origins.prefix != 'place:' 
          AND moz_places.url != 'about:blank'""")
-        self.ffdonn1 = cursor.fetchall()
+        ffdonn1bis = cursor.fetchall()
+
+        # suppression des doublons
+        for nbre, donnee in enumerate(ffdonn1bis):
+            if donnee[1] not in ffdonnbisbis:
+                ffdonnbisbis.append(donnee[1])
+                self.ffdonn1.append(donnee)
 
         # Préparation du contenu de la table "gestion_erreur"
         # Preparation of the content of the "gestion_erreur" table
@@ -194,9 +203,6 @@ class Gestionbdd(Interdemar):
         repenr = cursor.fetchone()
         print(repenr)
         accept = self.lienasupprimer(monurl)
-        # print("le lien à supprimer est :")
-        # print(f"id : {repenr[0]} | url : {repenr[2]}")
-        # accept = input(f"êtes-vous sûr de vouloir supprimer le lien ?")
         if accept == 1:
             cursor.execute("""DELETE FROM liens_meta WHERE id = ?""", (repenr[0],))
             cursor.execute("DELETE FROM gestion_erreur WHERE id = ?", (repenr[0],))
@@ -207,7 +213,7 @@ class Gestionbdd(Interdemar):
         else:
             print("Le lien n'a pas été supprimé")
 
-    def cherchebdd(self, motclef):
+    def cherchebdd1(self, motclef):
 
         print("lancement fonction d'une recherche d'un enregistrement dans ma bdd.....")
         # connection à la bdd interne
@@ -216,11 +222,13 @@ class Gestionbdd(Interdemar):
 
         connection = sqlite3.connect(utl.CHEMBD)
         cursor = connection.cursor()
-        cursor.execute(""" SELECT * FROM liens_meta WHERE url LIKE ? """, (motclef, ))
-        marecherche = cursor.fetchall()
-        connection.commit()
+        cursor.execute(""" SELECT host, url, titre FROM liens_meta WHERE url LIKE ? """, (motclef, ))
+        affichlist1 = cursor.fetchall()
+        cursor.execute("""SELECT COUNT (*) FROM liens_meta WHERE url LIKE ?""", (motclef,))
+        comptenregist = cursor.fetchone()
+
         connection.close()
-        return marecherche
+        return affichlist1, comptenregist
 
     def recupbddaffich1(self):
         connection = sqlite3.connect(utl.CHEMBD)
